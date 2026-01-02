@@ -21,16 +21,17 @@ form.addEventListener("submit", (event) =>{
   let page = 1;
   let search = input.value.trim();
   event.preventDefault();
-  showLoader();
   clearGallery();
   hideLoadMoreButton();
   if(search === ""){
     errorMessage("Невалидный ввод")
+    return
   }else{
-    setTimeout(() =>{
+      showLoader();
       hideLoader();
           if (page > 1){
             showLoadMoreButton();
+            hideLoader();
             }
       getImagesByQuery(search, page)
       .then((data) => {
@@ -39,13 +40,15 @@ form.addEventListener("submit", (event) =>{
           "Sorry, there are no images matching your search query. Please try again!");
           }else{
           createGallery(data.hits);
+          hideLoader();
           showLoadMoreButton();
       }
       })
       .catch((error) =>{
-        console.log(error);
+        hideLoader();
+        errorMessage("Sorry, there are no images matching your search query. Please try again!");
       })
-        }, 1000);
+        
    
   }
 });
@@ -55,12 +58,11 @@ form.addEventListener("submit", (event) =>{
           let search = input.value.trim();
           hideLoadMoreButton();
             showLoader();
-          setTimeout(() => {
               getImagesByQuery(search, page)
               .then(data => {
             const totalPages = Math.ceil(data.totalHits / 15); 
             hideLoader();
-            if(totalPages === page){
+            if(totalPages <= page){
               hideLoadMoreButton();
               errorMessage(
                 "We're sorry, but you've reached the end of search results.")
@@ -79,8 +81,8 @@ form.addEventListener("submit", (event) =>{
           })
           .catch(error => {
             hideLoader();
-            console.log(error)});
-          }, 1000)
+            errorMessage(
+                "We're sorry, but you've reached the end of search results.")});
           
         }
       )
