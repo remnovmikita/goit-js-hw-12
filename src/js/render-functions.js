@@ -17,7 +17,7 @@ export const hideLoadMoreButton = () => bntLoad.classList.remove("show");
 export function createGallery(images){
     const li = images
                     .map(({webformatURL, largeImageURL, tags, likes, views, comments, downloads}) =>
-                    `<li class ="gallarey-item">
+                    `<li class ="gallary-item">
                     <a class = "gallery-link" href="${largeImageURL}">
                     <img
                         class = "gallery-image"    

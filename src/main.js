@@ -17,50 +17,43 @@ import { hideLoadMoreButton } from "./js/render-functions";
 let page = 1;
 
 
-form.addEventListener("submit", (event) =>{
-  let page = 1;
-  let search = input.value.trim();
+form.addEventListener("submit", async (event) =>{
+  
   event.preventDefault();
+  const search = input.value.trim();
   clearGallery();
   hideLoadMoreButton();
   if(search === ""){
     errorMessage("Невалидный ввод")
     return
-  }else{
-      showLoader();
-      hideLoader();
-          if (page > 1){
-            showLoadMoreButton();
-            hideLoader();
-            }
-      getImagesByQuery(search, page)
-      .then((data) => {
-          if(data.hits.length === 0){
+  }
+  showLoader();
+      try{
+        const data = await getImagesByQuery(search, page);
+        if(data.hits.length === 0){
           errorMessage(
           "Sorry, there are no images matching your search query. Please try again!");
           }else{
           createGallery(data.hits);
-          hideLoader();
-          showLoadMoreButton();
-      }
-      })
-      .catch((error) =>{
-        hideLoader();
+          if(page >= 1){
+            showLoadMoreButton();
+          }
+        }
+      }catch (error) {
         errorMessage("Sorry, there are no images matching your search query. Please try again!");
-      })
-        
-   
-  }
+      } finally{
+        hideLoader();
+      };
 });
   
- bntLoad.addEventListener("click", () => {
+ bntLoad.addEventListener("click", async () => {
           page += 1;
-          let search = input.value.trim();
+          const search = input.value.trim();
           hideLoadMoreButton();
             showLoader();
-              getImagesByQuery(search, page)
-              .then(data => {
-            const totalPages = Math.ceil(data.totalHits / 15); 
+            try{
+              const data = await getImagesByQuery(search,page);
+              const totalPages = Math.ceil(data.totalHits / 15); 
             hideLoader();
             if(totalPages <= page){
               hideLoadMoreButton();
@@ -69,20 +62,18 @@ form.addEventListener("submit", (event) =>{
             }else{
             
             createGallery(data.hits);
-            const img = document.querySelector(".gallarey-item");
+            const img = document.querySelector(".gallary-item");
             const rect = img.getBoundingClientRect();
             window.scrollBy({
-              top: (rect.x * 4),
+              top: (rect.x * 2),
               left: 100,
               behavior: "smooth",
               });
             showLoadMoreButton();
             }
-          })
-          .catch(error => {
-            hideLoader();
-            errorMessage(
-                "We're sorry, but you've reached the end of search results.")});
-          
+            } catch(error) {
+            errorMessage("We're sorry, but you've reached the end of search results.")
+          }finally{
+          hideLoader();
         }
-      )
+ });
