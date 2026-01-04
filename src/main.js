@@ -10,11 +10,10 @@ import { showLoader, hideLoader, showLoadMoreButton, hideLoadMoreButton, clearGa
 
 
 
-let page = 0;
+let page = 1;
 
 
 form.addEventListener("submit", async (event) =>{
-  page += 1;
   event.preventDefault();
   const search = input.value.trim();
   clearGallery();
@@ -30,14 +29,18 @@ form.addEventListener("submit", async (event) =>{
           errorMessage(
           "Sorry, there are no images matching your search query. Please try again!");
           }else{
-          createGallery(data.hits);
-          showLoadMoreButton();
+            const totalPages = Math.ceil(data.totalHits / data.perPage); 
+            if( totalPages <= data.perPage){
+                createGallery(data.hits);
+                showLoadMoreButton();
+            }
         }
       }catch (error) {
         errorMessage("Sorry, there are no images matching your search query. Please try again!");
       } finally{
         hideLoader();
-        page = 0;
+        page = 1;
+        // input.value = "";
       };
 });
   
@@ -49,21 +52,17 @@ form.addEventListener("submit", async (event) =>{
             try{
               const data = await getImagesByQuery(search,page);
               const totalPages = Math.ceil(data.totalHits / data.perPage); 
-            hideLoader();
             if(totalPages <= page){
+              createGallery(data.hits);
               hideLoadMoreButton();
               errorMessage(
                 "We're sorry, but you've reached the end of search results.")
             }else{
             
             createGallery(data.hits);
-            const img = document.querySelector(".gallary-item");
-            const rect = img.getBoundingClientRect();
-            window.scrollBy({
-              top: (rect.height * 2),
-              // left: 100,
-              behavior: "smooth",
-              });
+            const img = document.querySelector(".gallery-item");
+            // const rect = img.getBoundingClientRect();
+            
             showLoadMoreButton();
             }
             } catch(error) {
