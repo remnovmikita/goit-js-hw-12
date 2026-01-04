@@ -16,7 +16,7 @@ export const getImagesByQuery = async (qwery, page) => {
        page: page,
     }, 
     })
-    return response.data;
+    return { ...response.data , perPage};
     } catch (error){
         throw error
     }

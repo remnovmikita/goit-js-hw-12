@@ -4,21 +4,17 @@ const input = document.querySelector('[name="search-text"]');
 const bntLoad = document.querySelector(".showLoad");
 
 // Import first function
-import { errorMessage } from "./js/render-functions";
 import { getImagesByQuery } from "./js/pixabay-api";
-import { createGallery } from "./js/render-functions";
-import { showLoader } from "./js/render-functions";
-import { hideLoader } from "./js/render-functions";
-import { clearGallery } from "./js/render-functions";
-import { showLoadMoreButton } from "./js/render-functions";
-import { hideLoadMoreButton } from "./js/render-functions";
+import { showLoader, hideLoader, showLoadMoreButton, hideLoadMoreButton, clearGallery, createGallery, errorMessage } from "./js/render-functions";
 
 
-let page = 1;
+
+
+let page = 0;
 
 
 form.addEventListener("submit", async (event) =>{
-  
+  page += 1;
   event.preventDefault();
   const search = input.value.trim();
   clearGallery();
@@ -35,14 +31,13 @@ form.addEventListener("submit", async (event) =>{
           "Sorry, there are no images matching your search query. Please try again!");
           }else{
           createGallery(data.hits);
-          if(page >= 1){
-            showLoadMoreButton();
-          }
+          showLoadMoreButton();
         }
       }catch (error) {
         errorMessage("Sorry, there are no images matching your search query. Please try again!");
       } finally{
         hideLoader();
+        page = 0;
       };
 });
   
@@ -53,7 +48,7 @@ form.addEventListener("submit", async (event) =>{
             showLoader();
             try{
               const data = await getImagesByQuery(search,page);
-              const totalPages = Math.ceil(data.totalHits / 15); 
+              const totalPages = Math.ceil(data.totalHits / data.perPage); 
             hideLoader();
             if(totalPages <= page){
               hideLoadMoreButton();
@@ -65,8 +60,8 @@ form.addEventListener("submit", async (event) =>{
             const img = document.querySelector(".gallary-item");
             const rect = img.getBoundingClientRect();
             window.scrollBy({
-              top: (rect.x * 2),
-              left: 100,
+              top: (rect.height * 2),
+              // left: 100,
               behavior: "smooth",
               });
             showLoadMoreButton();
