@@ -44,4 +44,13 @@ export function createGallery(images){
         lightbox.refresh();
 }
   
-
+import iziToast from "izitoast";
+// Додатковий імпорт стилів
+import "izitoast/dist/css/iziToast.min.css";
+export const showMessage = (type, message)=>{
+  iziToast[type]({
+    title: type.charAt(0).toUpperCase() + type.slice(1),
+    message: message,
+    position: 'topRight',
+  })
+}

@@ -7,18 +7,9 @@ const bntLoad = document.querySelector(".showLoad");
 
 import { getImagesByQuery, perPage } from "./js/pixabay-api";
 import { showLoader, hideLoader, showLoadMoreButton, 
-  hideLoadMoreButton, clearGallery, createGallery } from "./js/render-functions";
+  hideLoadMoreButton, clearGallery, createGallery, showMessage } from "./js/render-functions";
 
-import iziToast from "izitoast";
-// Додатковий імпорт стилів
-import "izitoast/dist/css/iziToast.min.css";
-export const showMessage = (type, message)=>{
-  iziToast[type]({
-    title: type.charAt(0).toUpperCase() + type.slice(1),
-    message: message,
-    position: 'topRight',
-  })
-}
+
 
 let search = "";
 let page = 1;
@@ -27,12 +18,13 @@ let page = 1;
 form.addEventListener("submit", async (event) =>{
   event.preventDefault();
   search = input.value.trim();
-  clearGallery();
+  
   hideLoadMoreButton();
   if(search === ""){
-    showMessage("error" ,"Невалидный ввод")
+    showMessage("error" ,"Невалидный ввод");
     return
   }
+  clearGallery();
   page = 1;
   showLoader();
       try{
@@ -46,7 +38,6 @@ form.addEventListener("submit", async (event) =>{
             if( page > totalPages ){
                   showMessage("info", 
                 "We're sorry, but you've reached the end of search results.")
-                hideLoadMoreButton();
             }else{
               createGallery(data.hits);
                 showLoadMoreButton();  
@@ -66,19 +57,21 @@ form.addEventListener("submit", async (event) =>{
             try{
               const data = await getImagesByQuery(search,page);
               const totalPages = Math.ceil(data.totalHits / perPage); 
-            if(totalPages < page){
+            if(page > totalPages){
               hideLoadMoreButton();
-              showMessage("error", 
+              showMessage("info", 
                 "We're sorry, but you've reached the end of search results.")
             }else{
             
             createGallery(data.hits);
             const img = document.querySelector(".gallery-item")
-            const rect = img.getBoundingClientRect();
+            if(img){
+               const rect = img.getBoundingClientRect();
             window.scrollBy({
               top: rect.height * 2,
               behavior: "smooth"
             });
+            }
             showLoadMoreButton();
             }
             } catch(error) {
