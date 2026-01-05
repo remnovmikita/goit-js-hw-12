@@ -9,13 +9,13 @@ import { showLoader, hideLoader, showLoadMoreButton, hideLoadMoreButton, clearGa
 
 
 
-
+let search = "";
 let page = 1;
 
 
 form.addEventListener("submit", async (event) =>{
   event.preventDefault();
-  const search = input.value.trim();
+  search = input.value.trim();
   clearGallery();
   hideLoadMoreButton();
   if(search === ""){
@@ -24,13 +24,14 @@ form.addEventListener("submit", async (event) =>{
   }
   showLoader();
       try{
+        page = 1;
         const data = await getImagesByQuery(search, page);
         if(data.hits.length === 0){
           errorMessage(
           "Sorry, there are no images matching your search query. Please try again!");
           }else{
             const totalPages = Math.ceil(data.totalHits / data.perPage); 
-            if( totalPages <= data.perPage){
+            if( totalPages >= page ){
                 createGallery(data.hits);
                 showLoadMoreButton();
             }
@@ -39,14 +40,13 @@ form.addEventListener("submit", async (event) =>{
         errorMessage("Sorry, there are no images matching your search query. Please try again!");
       } finally{
         hideLoader();
-        page = 1;
-        // input.value = "";
+        
+        input.value = "";
       };
 });
   
  bntLoad.addEventListener("click", async () => {
           page += 1;
-          const search = input.value.trim();
           hideLoadMoreButton();
             showLoader();
             try{
@@ -60,13 +60,16 @@ form.addEventListener("submit", async (event) =>{
             }else{
             
             createGallery(data.hits);
-            const img = document.querySelector(".gallery-item");
-            // const rect = img.getBoundingClientRect();
-            
+            const img = document.querySelector(".gallery-item")
+            const rect = img.getBoundingClientRect();
+            window.scrollBy({
+              top: rect.height * 2,
+              behavior: "smooth"
+            });
             showLoadMoreButton();
             }
             } catch(error) {
-            errorMessage("We're sorry, but you've reached the end of search results.")
+            errorMessage("We're sorry, щось трапилося")
           }finally{
           hideLoader();
         }
