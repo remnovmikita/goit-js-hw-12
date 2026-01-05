@@ -4,10 +4,27 @@ const input = document.querySelector('[name="search-text"]');
 const bntLoad = document.querySelector(".showLoad");
 
 // Import first function
+// Описаний у документації
+import SimpleLightbox from "simplelightbox";
+// Додатковий імпорт стилів
+import "simplelightbox/dist/simple-lightbox.min.css";
+// Описаний у документації
+
 import { getImagesByQuery } from "./js/pixabay-api";
-import { showLoader, hideLoader, showLoadMoreButton, hideLoadMoreButton, clearGallery, createGallery, errorMessage } from "./js/render-functions";
+import { showLoader, hideLoader, showLoadMoreButton, 
+  hideLoadMoreButton, clearGallery, createGallery } from "./js/render-functions";
 
+import iziToast from "izitoast";
+// Додатковий імпорт стилів
+import "izitoast/dist/css/iziToast.min.css";
 
+const errorMessage = (msg) =>{
+    iziToast.error({
+    title: 'Error',
+    position: 'topRight',
+    message: msg,
+});
+}
 
 let search = "";
 let page = 1;
@@ -31,17 +48,18 @@ form.addEventListener("submit", async (event) =>{
           "Sorry, there are no images matching your search query. Please try again!");
           }else{
             const totalPages = Math.ceil(data.totalHits / data.perPage); 
-            if( totalPages >= page ){
+            if( page > totalPages ){
                 createGallery(data.hits);
-                showLoadMoreButton();
+                  errorMessage(
+                "We're sorry, but you've reached the end of search results.")
             }
+            createGallery(data.hits);
+                showLoadMoreButton();  
         }
       }catch (error) {
         errorMessage("Sorry, there are no images matching your search query. Please try again!");
       } finally{
         hideLoader();
-        
-        input.value = "";
       };
 });
   
@@ -52,7 +70,7 @@ form.addEventListener("submit", async (event) =>{
             try{
               const data = await getImagesByQuery(search,page);
               const totalPages = Math.ceil(data.totalHits / data.perPage); 
-            if(totalPages <= page){
+            if(totalPages < page){
               createGallery(data.hits);
               hideLoadMoreButton();
               errorMessage(

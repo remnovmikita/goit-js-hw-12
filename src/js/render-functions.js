@@ -45,14 +45,3 @@ export function createGallery(images){
 }
   
 
-import iziToast from "izitoast";
-// Додатковий імпорт стилів
-import "izitoast/dist/css/iziToast.min.css";
-
-export const errorMessage = (msg) =>{
-    iziToast.error({
-    title: 'Error',
-    position: 'topRight',
-    message: msg,
-});
-}
